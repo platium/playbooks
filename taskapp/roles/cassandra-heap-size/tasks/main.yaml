@@ -1,0 +1,27 @@
+- name: Retrieve heap size
+  shell: "/bin/cat /sys/fs/cgroup/memory$(cat /proc/self/cgroup | grep memory | cut -d: -f3)/memory.limit_in_bytes"
+  register: output
+
+- name: Set heap size value
+  set_fact:
+    heap_size_value: "{{ output.stdout }}"
+
+# Heap size is automatically calculated by cassandra-env based on this
+# formula: max(min(1/2 ram, 1024MB), min(1/4 ram, 8GB))
+# That is:
+# - calculate 1/2 ram and cap to 1024MB
+# - calculate 1/4 ram and cap to 8192MB
+# - pick the max
+- name: Set heap size fact
+  set_fact:
+    heap_size: "{{ (([[(heap_size_value | int) / 2,1024*1024*1024] | min, [(heap_size_value | int) / 4, 8192*1024*1024] | min] | max) / 1024 / 1024) | int }}"
+
+- debug: msg={{ heap_size }}
+
+#- debug: var="{{ hostvars['tapp-1'] }}"
+
+#- name: Calculate heap size
+#  set_fact:
+#    - heap_size: "{{ item / 1024 }}"
+#  with-items:
+#    - "{{ heap_size_retrieve.stdout_lines }}"

@@ -1,0 +1,29 @@
+--- 
+- name: Retrieve environment information
+  shell: /usr/local/bin/envinfo
+  register: output
+
+- name: Set environment output fact
+  set_fact:
+    env_output: "{{ output.stdout | from_json }}"
+
+- name: Add cassandra hosts
+  add_host:
+    hostname: "{{ item.ip }}"
+    ansible_user: root
+    ansible_ssh_user: root
+    groupname: "cassandra_nodes"
+  when: item.templateName is defined and item.templateName == "taskapp"
+  with_items:
+    - "{{ env_output.containers }}"
+
+- name: Set seed node
+  shell: echo "{{ groups['cassandra_nodes'].0 }}"
+  vars: 
+    cassandra_seeds: "{{ item }}"
+  with_items:
+    - "{{ groups['cassandra_nodes'].0 }}"
+
+##- debug: msg={{ cassandra_seeds }}
+
+##- debug: msg={{ groups['cassandra_nodes'] }}

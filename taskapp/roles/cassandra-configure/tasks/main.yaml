@@ -1,0 +1,23 @@
+- name: Register seed node
+  shell: /bin/echo "{{ groups['cassandra_nodes'].0 }}"
+  register: cassandra_seeds
+
+- name: Set JVM options
+  template: src=files/jvm.j2 dest=/etc/cassandra/jvm.options backup=true
+
+- name: Set Cassandra config file
+  template: src=files/cassandra.j2 dest=/etc/cassandra/cassandra.yaml backup=true
+
+- name: Check Cassandra system.log existence
+  stat: path=/var/log/cassandra/system.log
+  register: system_log_file
+
+- name: Clear Cassandra system.log
+  when: system_log_file.stat.exists == True
+  shell: echo > /var/log/cassandra/system.log
+
+- name: Cassandra startup
+  service: name=cassandra state=started
+
+- name: Wait for server autostart
+  wait_for: path=/var/log/cassandra/system.log search_regex="Starting listening for CQL clients"

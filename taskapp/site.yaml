@@ -1,0 +1,24 @@
+- hosts: localhost
+  remote_user: root
+  gather_facts: no
+  roles:
+    - prepare
+
+- hosts: cassandra_nodes ansible_connection=ssh ansible_ssh_user=root
+  remote_user: root
+  gather_facts: no
+  roles:
+    - cassandra-cleanup
+
+- hosts: cassandra_nodes ansible_connection=ssh ansible_ssh_user=root
+  remote_user: root
+  gather_facts: no
+  roles:
+    - cassandra-heap-size
+
+- hosts: cassandra_nodes ansible_connection=ssh ansible_ssh_user=root
+  remote_user: root
+  serial: 1
+  gather_facts: no
+  roles:
+    - cassandra-configure
