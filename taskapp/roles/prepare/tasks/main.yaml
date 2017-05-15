@@ -1,4 +1,7 @@
---- 
+
+- debug: 
+    msg: "{{ pacman }}"
+
 - name: Retrieve environment information
   shell: /usr/local/bin/envinfo
   register: output

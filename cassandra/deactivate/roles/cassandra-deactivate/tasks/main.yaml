@@ -1,0 +1,5 @@
+- name: Cassnadra decomission
+  shell: "nodetool decommission"
+  register: decomission_result
+
+- debug: var=decomission_result

@@ -1,8 +1,8 @@
-#- name: Register seed node
-#  shell: /bin/echo "{{ groups['cassandra_nodes'].0 }}"
-#  register: cassandra_seeds
-- debug:
-    msg: {{ cassandra_seeds}}
+
+- name: Cassnada seed list fact
+  set_fact: cassandra_seed_list="{{ cassandra_seeds | join(',') }}"
+
+- debug: var=cassandra_seed_list
 
 - name: Set JVM options
   template: src=files/jvm.j2 dest=/etc/cassandra/jvm.options backup=true
@@ -23,3 +23,4 @@
 
 - name: Wait for server autostart
   wait_for: path=/var/log/cassandra/system.log search_regex="Starting listening for CQL clients"
+

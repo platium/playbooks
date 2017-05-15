@@ -1,0 +1,12 @@
+- hosts: localhost
+  remote_user: root
+  gather_facts: no
+  roles:
+    - cassandra-common
+
+- hosts: operation_hosts ansible_connection=ssh ansible_ssh_user=root
+  remote_user: root
+  gather_facts: no
+  roles:
+    - cassandra-deactivate
+

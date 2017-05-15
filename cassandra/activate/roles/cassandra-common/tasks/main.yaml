@@ -1,0 +1,21 @@
+
+- debug: 
+    msg: "{{ cassandra_seeds, operation_hosts }}"
+
+- name: Build operation hosts
+  add_host:
+    hostname: "{{ item }}"
+    ansible_user: root
+    ansible_ssh_user: root
+    groupname: "operation_hosts"
+  with_items:
+    - "{{ operation_hosts }}"
+
+- name: Build cassandra seed hosts
+  add_host: 
+    hostname: "{{ item }}"
+    ansible_user: root
+    ansible_ssh_user: root
+    groupname: "cassandra_seed_hosts"
+  with_items: "{{ cassandra_seeds }}"
+
